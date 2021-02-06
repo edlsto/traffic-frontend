@@ -1,58 +1,75 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+  <div class="text-center bg-gray-200 h-full">
+    <div class="font-sans-serif pt-12 text-gray-700">
+      <h1 class="text-6xl sm:text-8xl font-bold">
+        I-70 guide
+      </h1>
+      <div class="text-lg" v-if="travelTime">
+        <h2 class="text-lg mt-8">
+          Travel time between Vail and Denver (eastbound) is currently
+          {{ this.travelTime[0].TravelTime[0].Hours[0] }} hour
+          {{ this.travelTime[0].TravelTime[0].Minutes[0] }} minutes
+        </h2>
+        <h2 class="text-lg mt-4">
+          Travel time between Denver and Vail (westbound) is currently
+          {{ this.travelTime[1].TravelTime[0].Hours[0] }} hour
+          {{ this.travelTime[1].TravelTime[0].Minutes[0] }} minutes
+        </h2>
+      </div>
+    </div>
+    <Chart />
+    <div v-if="data" class="flex flex-wrap justify-center">
+      <div
+        v-for="(image, index) in data.CameraView"
+        :key="index"
+        class="p-4 rounded bg-white m-4 shadow"
+      >
+        <img :src="baseURL + image.ImageLocation" alt="" />
+        <div class="text-left">
+          <p class="pt-4 font-bold text-left text-blue-600">
+            {{ image.CameraName[0] }}
+          </p>
+          <p class="text-xs uppercase">
+            Last updated: {{ formatTime(image.LastUpdatedDate[0]) }}
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
+import axios from "axios";
+import moment from "moment";
+import Chart from "./Chart";
 export default {
-  name: 'HelloWorld',
+  name: "HelloWorld",
   props: {
-    msg: String
-  }
-}
+    msg: String,
+  },
+  components: {
+    Chart,
+  },
+  data() {
+    return {
+      data: null,
+      baseURL: "http://www.cotrip.org/",
+      travelTime: null,
+    };
+  },
+  methods: {
+    formatTime(rawTime) {
+      return moment(rawTime).format("h:mm a MMM. D");
+    },
+  },
+  async created() {
+    const data = await axios.get("http://localhost:3000/photos");
+    this.data = data.data;
+    const travelTime = await axios.get("http://localhost:3000/speed");
+    this.travelTime = travelTime.data;
+  },
+};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>
+<style scoped></style>
