@@ -27,13 +27,24 @@ export default {
   async created() {
     const historical = await axios.get("https://edwardisthe.best/historical");
     const speeds = historical.data
-      .filter((d) => d.direction === "East")
+      .filter((d) => d.direction === "West")
       .filter((d) => d.travelTime !== "-1")
       .map((d) => ({
         timeStamp: Date.parse(d.timeStamp),
         travelTime: parseInt(d.travelTime),
       }));
     this.speeds = speeds;
+    this.todaysData = speeds.filter((datapoint) => {
+      return datapoint.timeStamp > d3.timeDay.floor(new Date());
+    });
+    this.lastWeeksData = speeds.filter((datapoint) => {
+      return (
+        datapoint.timeStamp >
+          d3.timeDay.floor(d3.timeDay.offset(new Date(), -7)) &&
+        datapoint.timeStamp <
+          d3.timeDay.floor(d3.timeDay.offset(new Date(), -6))
+      );
+    });
     this.createGraph();
   },
   methods: {
@@ -55,7 +66,10 @@ export default {
 
       const x = d3
         .scaleTime()
-        .domain(d3.extent(this.speeds, (d) => d.timeStamp))
+        .domain([
+          d3.timeDay.floor(d3.max(this.todaysData, (d) => d.timeStamp)),
+          d3.timeDay.ceil(d3.max(this.todaysData, (d) => d.timeStamp)),
+        ])
         .range([0, this.width]);
       svg
         .append("g")
@@ -84,10 +98,10 @@ export default {
       svg
         .append("path")
         .attr("id", "lineGraph")
-        .datum(this.speeds)
+        .datum(this.todaysData)
         .attr("fill", "none")
         .attr("stroke", "steelblue")
-        .attr("stroke-width", 2)
+        .attr("stroke-width", 4)
         .attr("opacity", 0.7)
         .attr("cursor", "pointer")
         .attr(
@@ -95,6 +109,24 @@ export default {
           d3
             .line()
             .x((d) => x(d.timeStamp))
+            .y((d) => y(d.travelTime))
+            .curve(d3.curveCatmullRom.alpha(0.5))
+        );
+
+      svg
+        .append("path")
+        .attr("id", "lastWeeksData")
+        .datum(this.lastWeeksData)
+        .attr("fill", "none")
+        .attr("stroke", "steelblue")
+        .attr("stroke-width", 4)
+        .attr("opacity", 0.3)
+        .attr("cursor", "pointer")
+        .attr(
+          "d",
+          d3
+            .line()
+            .x((d) => x(d3.timeDay.offset(d.timeStamp, 7)))
             .y((d) => y(d.travelTime))
             .curve(d3.curveCatmullRom.alpha(0.5))
         );
