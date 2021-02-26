@@ -63,10 +63,14 @@ export default {
     },
   },
   async created() {
-    const data = await axios.get("https://edwardisthe.best/photos");
-    this.data = data.data;
-    const travelTime = await axios.get("https://edwardisthe.best/speed");
-    this.travelTime = travelTime.data;
+    try {
+      const data = await axios.get("https://edwardisthe.best/photos");
+      this.data = data.data;
+      const travelTime = await axios.get("https://edwardisthe.best/speed");
+      this.travelTime = travelTime.data;
+    } catch (error) {
+      console.log(error);
+    }
   },
 };
 </script>

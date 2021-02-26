@@ -1,5 +1,6 @@
 <template>
   <div id="chart-ctn">
+    <div class="loading" v-if="loading"><div class="lds-dual-ring"></div></div>
     <div id="chart"></div>
   </div>
 </template>
@@ -14,6 +15,7 @@ export default {
       speeds: null,
       formatTime: d3.timeFormat("%Y-%m-%d"),
       margin: { top: 10, right: 30, bottom: 30, left: 60 },
+      loading: true,
     };
   },
   computed: {
@@ -25,27 +27,32 @@ export default {
     },
   },
   async created() {
-    const historical = await axios.get("https://edwardisthe.best/historical");
-    const speeds = historical.data
-      .filter((d) => d.direction === "West")
-      .filter((d) => d.travelTime !== "-1")
-      .map((d) => ({
-        timeStamp: Date.parse(d.timeStamp),
-        travelTime: parseInt(d.travelTime),
-      }));
-    this.speeds = speeds;
-    this.todaysData = speeds.filter((datapoint) => {
-      return datapoint.timeStamp > d3.timeDay.floor(new Date());
-    });
-    this.lastWeeksData = speeds.filter((datapoint) => {
-      return (
-        datapoint.timeStamp >
-          d3.timeDay.floor(d3.timeDay.offset(new Date(), -7)) &&
-        datapoint.timeStamp <
-          d3.timeDay.floor(d3.timeDay.offset(new Date(), -6))
-      );
-    });
-    this.createGraph();
+    try {
+      let historical = await axios.get("https://edwardisthe.best/historical");
+      this.loading = false;
+      const speeds = historical.data
+        .filter((d) => d.direction === "West")
+        .filter((d) => d.travelTime !== "-1")
+        .map((d) => ({
+          timeStamp: Date.parse(d.timeStamp),
+          travelTime: parseInt(d.travelTime),
+        }));
+      this.speeds = speeds;
+      this.todaysData = speeds.filter((datapoint) => {
+        return datapoint.timeStamp > d3.timeDay.floor(new Date());
+      });
+      this.lastWeeksData = speeds.filter((datapoint) => {
+        return (
+          datapoint.timeStamp >
+            d3.timeDay.floor(d3.timeDay.offset(new Date(), -7)) &&
+          datapoint.timeStamp <
+            d3.timeDay.floor(d3.timeDay.offset(new Date(), -6))
+        );
+      });
+      this.createGraph();
+    } catch (error) {
+      console.log(error);
+    }
   },
   methods: {
     handleMouseover() {
@@ -177,5 +184,39 @@ export default {
 
 #linegraph {
   cursor: pointer;
+}
+
+.loading {
+  height: 400px;
+  width: 1600px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.3rem;
+}
+
+.lds-dual-ring {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+}
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 6px solid #fff;
+  border-color: #fff transparent #fff transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>
