@@ -1,5 +1,7 @@
 <template>
-  <div id="chart"></div>
+  <div id="chart-ctn">
+    <div id="chart"></div>
+  </div>
 </template>
 
 <script>
@@ -23,26 +25,26 @@ export default {
     },
   },
   async created() {
-    console.log("created");
-    const historical = await axios.get(
-      "https://traffic-app-edlsto.herokuapp.com/historical"
-    );
+    const historical = await axios.get("https://edwardisthe.best/historical");
     const speeds = historical.data
-      .filter((d) => d.direction === "West")
+      .filter((d) => d.direction === "East")
       .filter((d) => d.travelTime !== "-1")
       .map((d) => ({
         timeStamp: Date.parse(d.timeStamp),
         travelTime: parseInt(d.travelTime),
       }));
     this.speeds = speeds;
-    console.log(this.speeds);
     this.createGraph();
   },
   methods: {
+    handleMouseover() {
+      this.style("opacity", 1);
+    },
     createGraph() {
       const svg = d3
         .select("#chart")
         .append("svg")
+        .style("position", "relative")
         .attr("width", this.width + this.margin.left + this.margin.right)
         .attr("height", this.height + this.margin.top + this.margin.bottom)
         .append("g")
@@ -58,11 +60,15 @@ export default {
       svg
         .append("g")
         .attr("transform", "translate(0," + this.height + ")")
-        .call(d3.axisBottom(x));
+        .call(d3.axisBottom(x))
+        .style("position", "relative");
 
       const y = d3
         .scaleLinear()
-        .domain([5000, d3.max(this.speeds, (d) => d.travelTime)])
+        .domain([
+          d3.min(this.speeds, (d) => d.travelTime),
+          d3.max(this.speeds, (d) => d.travelTime),
+        ])
         .range([this.height, 0]);
 
       svg.append("g").call(
@@ -77,11 +83,13 @@ export default {
 
       svg
         .append("path")
+        .attr("id", "lineGraph")
         .datum(this.speeds)
         .attr("fill", "none")
         .attr("stroke", "steelblue")
-        .attr("stroke-width", 5)
+        .attr("stroke-width", 2)
         .attr("opacity", 0.7)
+        .attr("cursor", "pointer")
         .attr(
           "d",
           d3
@@ -90,14 +98,52 @@ export default {
             .y((d) => y(d.travelTime))
             .curve(d3.curveCatmullRom.alpha(0.5))
         );
+
+      const tooltip = d3
+        .select("#chart")
+        .append("div")
+        .style("position", "absolute")
+        .style("visibility", "visible")
+        .style("background-color", "red")
+        .style("top", "0")
+        .text("Hello");
+
+      d3.select("#lineGraph").on("mouseover", () => {
+        tooltip.style("visibility", "visible");
+      });
+
+      d3.select("#lineGraph").on("mouseout", () => {
+        tooltip.style("visibility", "hidden");
+      });
+
+      d3.select("#lineGraph").on("mousemove", (e) => {
+        let yCoor = d3.pointer(e)[1];
+        let seconds = y.invert(yCoor);
+        const dateObj = new Date(seconds * 1000);
+        const hours = dateObj.getUTCHours();
+        const minutes = dateObj.getUTCMinutes();
+        const timeString = hours + ":" + minutes.toString().padStart(2, "0");
+        tooltip
+          .text(timeString)
+          .style("left", d3.pointer(e)[0] + 60 + "px")
+          .style("top", d3.pointer(e)[1] + "px");
+      });
     },
   },
 };
 </script>
 
 <style scoped>
-#chart {
+#chart-ctn {
   display: flex;
   justify-content: center;
+}
+
+#chart {
+  position: relative;
+}
+
+#linegraph {
+  cursor: pointer;
 }
 </style>
