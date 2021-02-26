@@ -63,8 +63,18 @@ export default {
         .select("#chart")
         .append("svg")
         .style("position", "relative")
-        .attr("width", this.width + this.margin.left + this.margin.right)
-        .attr("height", this.height + this.margin.top + this.margin.bottom)
+        // .attr("width", this.width + this.margin.left + this.margin.right)
+        // .attr("height", this.height + this.margin.top + this.margin.bottom)
+        .attr(
+          "viewBox",
+          `0 0 ${this.width + this.margin.left + this.margin.right} ${this
+            .height +
+            this.margin.top +
+            this.margin.bottom}`
+        )
+        .attr("width", "100%")
+        .attr("height", "100%")
+
         .append("g")
         .attr(
           "transform",
@@ -180,6 +190,8 @@ export default {
 
 #chart {
   position: relative;
+  width: 90%;
+  height: 400px;
 }
 
 #linegraph {
