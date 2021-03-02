@@ -1,12 +1,17 @@
 <template>
-  <div id="chart-ctn">
-    <div class="loading" v-if="loading"><div class="lds-dual-ring"></div></div>
-    <div id="chart"></div>
+  <!-- <div class="loading"><div class="lds-dual-ring"></div></div> -->
+  <div id="chart" v-if="this.todaysData">
+    <svg class="chart" :viewBox="viewBox">
+      <g :transform="`translate(${this.margin.left}, ${this.margin.top})`">
+        <path :d="line" class="line-chart__line"></path>
+        <g v-axis:x="scale" :transform="`translate(0, ${this.height})`"></g>
+        <g v-axis:y="scale"></g>
+      </g>
+    </svg>
   </div>
 </template>
 
 <script>
-import axios from "axios";
 import * as d3 from "d3";
 export default {
   name: "Chart",
@@ -15,171 +20,202 @@ export default {
       speeds: null,
       formatTime: d3.timeFormat("%Y-%m-%d"),
       margin: { top: 10, right: 30, bottom: 30, left: 60 },
-      loading: true,
+      // loading: true,
+      windowWidth: window.innerWidth,
     };
   },
+  props: {
+    todaysData: {
+      required: true,
+    },
+    lastWeeksData: {
+      required: true,
+    },
+    width: {
+      default: 1200,
+      type: Number,
+    },
+    height: {
+      default: 400,
+      type: Number,
+    },
+  },
+  updated() {
+    console.log(this.todaysData);
+    console.log(this.lastWeeksData);
+  },
   computed: {
-    width: function() {
-      return 1600 - this.margin.left - this.margin.right;
+    rangeX() {
+      const width = this.width;
+      return [0, width];
     },
-    height: function() {
-      return 400 - this.margin.top - this.margin.bottom;
+    rangeY() {
+      const height = this.height;
+      return [height, 0];
     },
-  },
-  async created() {
-    try {
-      let historical = await axios.get("https://edwardisthe.best/historical");
-      this.loading = false;
-      const speeds = historical.data
-        .filter((d) => d.direction === "West")
-        .filter((d) => d.travelTime !== "-1")
-        .map((d) => ({
-          timeStamp: Date.parse(d.timeStamp),
-          travelTime: parseInt(d.travelTime),
-        }));
-      this.speeds = speeds;
-      this.todaysData = speeds.filter((datapoint) => {
-        return datapoint.timeStamp > d3.timeDay.floor(new Date());
-      });
-      this.lastWeeksData = speeds.filter((datapoint) => {
-        return (
-          datapoint.timeStamp >
-            d3.timeDay.floor(d3.timeDay.offset(new Date(), -7)) &&
-          datapoint.timeStamp <
-            d3.timeDay.floor(d3.timeDay.offset(new Date(), -6))
-        );
-      });
-      this.createGraph();
-    } catch (error) {
-      console.log(error);
-    }
-  },
-  methods: {
-    handleMouseover() {
-      this.style("opacity", 1);
-    },
-    createGraph() {
-      const svg = d3
-        .select("#chart")
-        .append("svg")
-        .style("position", "relative")
-        .attr("width", this.width + this.margin.left + this.margin.right)
-        .attr("height", this.height + this.margin.top + this.margin.bottom)
-        .append("g")
-        .attr(
-          "transform",
-          "translate(" + this.margin.left + "," + this.margin.top + ")"
-        );
+    scale() {
+      if (this.todaysData) {
+        const x = d3.scaleTime().range(this.rangeX);
+        const y = d3.scaleLinear().range(this.rangeY);
 
-      const x = d3
-        .scaleTime()
-        .domain([
+        x.domain([
           d3.timeDay.floor(d3.max(this.todaysData, (d) => d.timeStamp)),
           d3.timeDay.ceil(d3.max(this.todaysData, (d) => d.timeStamp)),
-        ])
-        .range([0, this.width]);
-      svg
-        .append("g")
-        .attr("transform", "translate(0," + this.height + ")")
-        .call(d3.axisBottom(x))
-        .style("position", "relative");
-
-      const y = d3
-        .scaleLinear()
-        .domain([
-          d3.min(this.speeds, (d) => d.travelTime),
-          d3.max(this.speeds, (d) => d.travelTime),
-        ])
-        .range([this.height, 0]);
-
-      svg.append("g").call(
-        d3.axisLeft(y).tickFormat((s) => {
-          const dateObj = new Date(s * 1000);
-          const hours = dateObj.getUTCHours();
-          const minutes = dateObj.getUTCMinutes();
-          const timeString = hours + ":" + minutes.toString().padStart(2, "0");
-          return timeString;
-        })
-      );
-
-      svg
-        .append("path")
-        .attr("id", "lineGraph")
-        .datum(this.todaysData)
-        .attr("fill", "none")
-        .attr("stroke", "steelblue")
-        .attr("stroke-width", 4)
-        .attr("opacity", 0.7)
-        .attr("cursor", "pointer")
-        .attr(
-          "d",
-          d3
-            .line()
-            .x((d) => x(d.timeStamp))
-            .y((d) => y(d.travelTime))
-            .curve(d3.curveCatmullRom.alpha(0.5))
-        );
-
-      svg
-        .append("path")
-        .attr("id", "lastWeeksData")
-        .datum(this.lastWeeksData)
-        .attr("fill", "none")
-        .attr("stroke", "steelblue")
-        .attr("stroke-width", 4)
-        .attr("opacity", 0.3)
-        .attr("cursor", "pointer")
-        .attr(
-          "d",
-          d3
-            .line()
-            .x((d) => x(d3.timeDay.offset(d.timeStamp, 7)))
-            .y((d) => y(d.travelTime))
-            .curve(d3.curveCatmullRom.alpha(0.5))
-        );
-
-      const tooltip = d3
-        .select("#chart")
-        .append("div")
-        .style("position", "absolute")
-        .style("visibility", "visible")
-        .style("background-color", "red")
-        .style("top", "0")
-        .text("Hello");
-
-      d3.select("#lineGraph").on("mouseover", () => {
-        tooltip.style("visibility", "visible");
-      });
-
-      d3.select("#lineGraph").on("mouseout", () => {
-        tooltip.style("visibility", "hidden");
-      });
-
-      d3.select("#lineGraph").on("mousemove", (e) => {
-        let yCoor = d3.pointer(e)[1];
-        let seconds = y.invert(yCoor);
-        const dateObj = new Date(seconds * 1000);
-        const hours = dateObj.getUTCHours();
-        const minutes = dateObj.getUTCMinutes();
-        const timeString = hours + ":" + minutes.toString().padStart(2, "0");
-        tooltip
-          .text(timeString)
-          .style("left", d3.pointer(e)[0] + 60 + "px")
-          .style("top", d3.pointer(e)[1] + "px");
-      });
+        ]);
+        y.domain([
+          d3.min(this.todaysData, (d) => d.travelTime),
+          d3.max(this.todaysData, (d) => d.travelTime),
+        ]);
+        return {
+          x,
+          y,
+        };
+      } else return null;
+    },
+    path() {
+      if (this.todaysData) {
+        return d3
+          .line()
+          .x((d) => this.scale.x(d.timeStamp))
+          .y((d) => this.scale.y(d.travelTime))
+          .curve(d3.curveCatmullRom.alpha(0.5));
+      } else return null;
+    },
+    line() {
+      if (this.path) {
+        return this.path(this.todaysData);
+      } else {
+        return null;
+      }
+    },
+    viewBox() {
+      return `0 0 ${this.width + this.margin.left + this.margin.right} ${this
+        .height +
+        this.margin.bottom +
+        this.margin.top}`;
     },
   },
+  directives: {
+    axis(el, binding) {
+      const axis = binding.arg;
+      const axisMethod = { x: "axisBottom", y: "axisLeft" }[axis];
+      const methodArg = binding.value[axis];
+
+      // });
+      if (axis === "y") {
+        d3.select(el).call(
+          d3[axisMethod](methodArg).tickFormat((s) => {
+            const dateObj = new Date(s * 1000);
+            const hours = dateObj.getUTCHours();
+            const minutes = dateObj.getUTCMinutes();
+            const timeString =
+              hours + ":" + minutes.toString().padStart(2, "0");
+            return timeString;
+          })
+        );
+      } else {
+        d3.select(el).call(d3[axisMethod](methodArg));
+      }
+    },
+  },
+
+  // methods: {
+  // createGraph() {
+  // const svg = d3
+  //   .select("#chart")
+  //   .append("svg")
+  //   .style("position", "relative")
+  //   .attr("width", this.width + this.margin.left + this.margin.right)
+  //   .attr("height", this.height + this.margin.top + this.margin.bottom)
+
+  // .append("g")
+  // .attr(
+  //   "transform",
+  //   "translate(" + this.margin.left + "," + this.margin.top + ")"
+  // );
+
+  // svg
+  //   .append("g")
+  //   .attr("transform", "translate(0," + this.height + ")")
+  //   .call()
+  //   .style("position", "relative");
+
+  // svg.append("g").call();
+
+  // svg
+  //   .append("path")
+  //   .attr("id", "lineGraph")
+  //   .datum(this.todaysData)
+  //   .attr("fill", "none")
+  //   .attr("stroke", "steelblue")
+  //   .attr("stroke-width", 4)
+  //   .attr("opacity", 0.7)
+  //   .attr("cursor", "pointer")
+  //   .attr("d");
+
+  // svg
+  //   .append("path")
+  //   .attr("id", "lastWeeksData")
+  //   .datum(this.lastWeeksData)
+  //   .attr("fill", "none")
+  //   .attr("stroke", "steelblue")
+  //   .attr("stroke-width", 4)
+  //   .attr("opacity", 0.3)
+  //   .attr("cursor", "pointer")
+  //   .attr(
+  //     "d",
+  //     d3
+  //       .line()
+  //       .x((d) => x(d3.timeDay.offset(d.timeStamp, 7)))
+  //       .y((d) => y(d.travelTime))
+  //       .curve(d3.curveCatmullRom.alpha(0.5))
+  //       );
+
+  //     const tooltip = d3
+  //       .select("#chart")
+  //       .append("div")
+  //       .style("position", "absolute")
+  //       .style("visibility", "visible")
+  //       .style("background-color", "red")
+  //       .style("top", "0")
+  //       .text("Hello");
+
+  //     d3.select("#lineGraph").on("mouseover", () => {
+  //       tooltip.style("visibility", "visible");
+  //     });
+
+  //     d3.select("#lineGraph").on("mouseout", () => {
+  //       tooltip.style("visibility", "hidden");
+  //     });
+
+  //     d3.select("#lineGraph").on("mousemove", (e) => {
+  //       let yCoor = d3.pointer(e)[1];
+  //       let seconds = y.invert(yCoor);
+  //       const dateObj = new Date(seconds * 1000);
+  //       const hours = dateObj.getUTCHours();
+  //       const minutes = dateObj.getUTCMinutes();
+  //       const timeString = hours + ":" + minutes.toString().padStart(2, "0");
+  //       tooltip
+  //         .text(timeString)
+  //         .style("left", d3.pointer(e)[0] + 60 + "px")
+  //         .style("top", d3.pointer(e)[1] + "px");
+  //     });
+  //   },
+  // },
 };
 </script>
 
 <style scoped>
-#chart-ctn {
-  display: flex;
-  justify-content: center;
+.line-chart__line {
+  fill: none;
+  stroke: steelblue;
+  stroke-width: 1px;
 }
 
 #chart {
   position: relative;
+  height: 600px;
+  width: 1600px;
 }
 
 #linegraph {

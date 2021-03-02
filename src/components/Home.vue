@@ -17,7 +17,7 @@
         </h2>
       </div>
     </div>
-    <Chart />
+    <Chart :todaysData="this.todaysData" :lastWeeksData="this.lastWeeksData" />
     <div v-if="data" class="flex flex-wrap justify-center">
       <div
         v-for="(image, index) in data.CameraView"
@@ -39,11 +39,12 @@
 </template>
 
 <script>
+import * as d3 from "d3";
 import axios from "axios";
 import moment from "moment";
 import Chart from "./Chart";
 export default {
-  name: "HelloWorld",
+  name: "Home",
   props: {
     msg: String,
   },
@@ -55,6 +56,9 @@ export default {
       data: null,
       baseURL: "http://www.cotrip.org/",
       travelTime: null,
+      historicalData: null,
+      todaysData: null,
+      lastWeeksData: null,
     };
   },
   methods: {
@@ -68,6 +72,28 @@ export default {
       this.data = data.data;
       const travelTime = await axios.get("https://edwardisthe.best/speed");
       this.travelTime = travelTime.data;
+      console.log(this.data);
+      let historical = await axios.get("https://edwardisthe.best/historical");
+      this.loading = false;
+      const speeds = historical.data
+        .filter((d) => d.direction === "West")
+        .filter((d) => d.travelTime !== "-1")
+        .map((d) => ({
+          timeStamp: Date.parse(d.timeStamp),
+          travelTime: parseInt(d.travelTime),
+        }));
+      this.speeds = speeds;
+      this.todaysData = speeds.filter((datapoint) => {
+        return datapoint.timeStamp > d3.timeDay.floor(new Date());
+      });
+      this.lastWeeksData = speeds.filter((datapoint) => {
+        return (
+          datapoint.timeStamp >
+            d3.timeDay.floor(d3.timeDay.offset(new Date(), -7)) &&
+          datapoint.timeStamp <
+            d3.timeDay.floor(d3.timeDay.offset(new Date(), -6))
+        );
+      });
     } catch (error) {
       console.log(error);
     }
