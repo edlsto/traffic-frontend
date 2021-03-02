@@ -17,7 +17,14 @@
         </h2>
       </div>
     </div>
-    <Chart :todaysData="this.todaysData" :lastWeeksData="this.lastWeeksData" />
+    <Chart
+      :todaysData="this.todaysData"
+      :lastWeeksData="this.lastWeeksData"
+      v-if="this.todaysData"
+      class="chart"
+      :width="this.windowWidth"
+      :height="this.windowHeight"
+    />
     <div v-if="data" class="flex flex-wrap justify-center">
       <div
         v-for="(image, index) in data.CameraView"
@@ -59,11 +66,34 @@ export default {
       historicalData: null,
       todaysData: null,
       lastWeeksData: null,
+      windowWidth: window.innerWidth,
     };
+  },
+  computed: {
+    windowHeight() {
+      if (this.windowWidth < 600) {
+        return this.windowWidth * 1;
+      } else if (this.windowWidth < 1000) {
+        return this.windowWidth * 0.6;
+      } else {
+        return this.windowWidth * 0.3;
+      }
+    },
   },
   methods: {
     formatTime(rawTime) {
       return moment(rawTime).format("h:mm a MMM. D");
+    },
+    onResize() {
+      this.windowWidth = window.innerWidth;
+    },
+  },
+  mounted() {
+    window.addEventListener("resize", this.onResize);
+  },
+  watch: {
+    windowWidth: function(newSize, oldSize) {
+      console.log(newSize, oldSize);
     },
   },
   async created() {
@@ -72,7 +102,7 @@ export default {
       this.data = data.data;
       const travelTime = await axios.get("https://edwardisthe.best/speed");
       this.travelTime = travelTime.data;
-      console.log(this.data);
+      console.log(this.travelTime);
       let historical = await axios.get("https://edwardisthe.best/historical");
       this.loading = false;
       const speeds = historical.data
@@ -105,5 +135,9 @@ export default {
 <style scoped>
 .text-center {
   min-height: 100vh;
+}
+
+.chart {
+  /* max-width: 800px; */
 }
 </style>

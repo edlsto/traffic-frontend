@@ -1,14 +1,13 @@
 <template>
   <!-- <div class="loading"><div class="lds-dual-ring"></div></div> -->
-  <div id="chart" v-if="this.todaysData">
-    <svg class="chart" :viewBox="viewBox">
-      <g :transform="`translate(${this.margin.left}, ${this.margin.top})`">
-        <path :d="line" class="line-chart__line"></path>
-        <g v-axis:x="scale" :transform="`translate(0, ${this.height})`"></g>
-        <g v-axis:y="scale"></g>
-      </g>
-    </svg>
-  </div>
+  <svg class="chart" :viewBox="viewBox">
+    <g :transform="`translate(${this.margin.left}, ${this.margin.top})`">
+      <path :d="line2" class="line-chart__line last-week"></path>
+      <path :d="line" class="line-chart__line"></path>
+      <g v-axis:x="scale" :transform="`translate(0, ${this.height})`"></g>
+      <g v-axis:y="scale"></g>
+    </g>
+  </svg>
 </template>
 
 <script>
@@ -32,18 +31,15 @@ export default {
       required: true,
     },
     width: {
-      default: 1200,
+      default: 600,
       type: Number,
     },
     height: {
-      default: 400,
+      default: 200,
       type: Number,
     },
   },
-  updated() {
-    console.log(this.todaysData);
-    console.log(this.lastWeeksData);
-  },
+  updated() {},
   computed: {
     rangeX() {
       const width = this.width;
@@ -62,9 +58,11 @@ export default {
           d3.timeDay.floor(d3.max(this.todaysData, (d) => d.timeStamp)),
           d3.timeDay.ceil(d3.max(this.todaysData, (d) => d.timeStamp)),
         ]);
+        const maxTime = d3.max(this.todaysData, (d) => d.travelTime);
+        const minTime = d3.min(this.todaysData, (d) => d.travelTime);
         y.domain([
-          d3.min(this.todaysData, (d) => d.travelTime),
-          d3.max(this.todaysData, (d) => d.travelTime),
+          minTime < 4500 ? minTime : 4500,
+          maxTime > 6300 ? maxTime : 6300,
         ]);
         return {
           x,
@@ -81,9 +79,25 @@ export default {
           .curve(d3.curveCatmullRom.alpha(0.5));
       } else return null;
     },
+    path2() {
+      if (this.todaysData) {
+        return d3
+          .line()
+          .x((d) => this.scale.x(d3.timeDay.offset(d.timeStamp, 7)))
+          .y((d) => this.scale.y(d.travelTime))
+          .curve(d3.curveCatmullRom.alpha(0.5));
+      } else return null;
+    },
     line() {
       if (this.path) {
         return this.path(this.todaysData);
+      } else {
+        return null;
+      }
+    },
+    line2() {
+      if (this.path) {
+        return this.path2(this.lastWeeksData);
       } else {
         return null;
       }
@@ -209,13 +223,22 @@ export default {
 .line-chart__line {
   fill: none;
   stroke: steelblue;
-  stroke-width: 1px;
+  stroke-width: 2px;
+}
+
+.last-week {
+  stroke: steelblue;
+  opacity: 0.2;
+}
+
+@media only screen and (max-width: 600px) {
+  .line-chart__line {
+    stroke-width: 3px;
+  }
 }
 
 #chart {
   position: relative;
-  height: 600px;
-  width: 1600px;
 }
 
 #linegraph {
