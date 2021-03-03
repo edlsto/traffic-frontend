@@ -25,9 +25,10 @@
       :width="this.windowWidth"
       :height="this.windowHeight"
     />
-    <div v-if="data" class="flex flex-wrap justify-center">
+    <Spinner class="spinner" v-else :style="{ height: windowHeight + 'px' }" />
+    <div v-if="cameraData" class="flex flex-wrap justify-center">
       <div
-        v-for="(image, index) in data.CameraView"
+        v-for="(image, index) in cameraData.CameraView"
         :key="index"
         class="p-4 rounded bg-white m-4 shadow"
       >
@@ -50,17 +51,16 @@ import * as d3 from "d3";
 import axios from "axios";
 import moment from "moment";
 import Chart from "./Chart";
+import Spinner from "./Spinner";
 export default {
   name: "Home",
-  props: {
-    msg: String,
-  },
   components: {
     Chart,
+    Spinner,
   },
   data() {
     return {
-      data: null,
+      cameraData: null,
       baseURL: "http://www.cotrip.org/",
       travelTime: null,
       historicalData: null,
@@ -71,13 +71,7 @@ export default {
   },
   computed: {
     windowHeight() {
-      if (this.windowWidth < 600) {
-        return this.windowWidth * 1;
-      } else if (this.windowWidth < 1000) {
-        return this.windowWidth * 0.6;
-      } else {
-        return this.windowWidth * 0.3;
-      }
+      return (this.windowWidth * 600) / this.windowWidth;
     },
   },
   methods: {
@@ -91,22 +85,19 @@ export default {
   mounted() {
     window.addEventListener("resize", this.onResize);
   },
-  watch: {
-    windowWidth: function(newSize, oldSize) {
-      console.log(newSize, oldSize);
-    },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.onResize);
   },
   async created() {
     try {
-      const data = await axios.get("https://edwardisthe.best/photos");
-      this.data = data.data;
+      const cameraData = await axios.get("https://edwardisthe.best/photos");
+      this.cameraData = cameraData.data;
       const travelTime = await axios.get("https://edwardisthe.best/speed");
       this.travelTime = travelTime.data;
-      console.log(this.travelTime);
       let historical = await axios.get("https://edwardisthe.best/historical");
       this.loading = false;
       const speeds = historical.data
-        .filter((d) => d.direction === "West")
+        .filter((d) => d.direction === "East")
         .filter((d) => d.travelTime !== "-1")
         .map((d) => ({
           timeStamp: Date.parse(d.timeStamp),
@@ -114,12 +105,18 @@ export default {
         }));
       this.speeds = speeds;
       this.todaysData = speeds.filter((datapoint) => {
-        return datapoint.timeStamp > d3.timeDay.floor(new Date());
+        return (
+          datapoint.timeStamp >
+          d3.timeHour.offset(d3.timeDay.floor(new Date()), 4)
+        );
       });
       this.lastWeeksData = speeds.filter((datapoint) => {
         return (
           datapoint.timeStamp >
-            d3.timeDay.floor(d3.timeDay.offset(new Date(), -7)) &&
+            d3.timeHour.offset(
+              d3.timeDay.floor(d3.timeDay.offset(new Date(), -7)),
+              4
+            ) &&
           datapoint.timeStamp <
             d3.timeDay.floor(d3.timeDay.offset(new Date(), -6))
         );
