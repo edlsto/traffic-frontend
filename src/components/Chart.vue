@@ -39,7 +39,6 @@ export default {
       type: Number,
     },
   },
-  updated() {},
   computed: {
     rangeX() {
       const width = this.width;
@@ -53,9 +52,11 @@ export default {
       if (this.todaysData) {
         const x = d3.scaleTime().range(this.rangeX);
         const y = d3.scaleLinear().range(this.rangeY);
-
         x.domain([
-          d3.timeDay.floor(d3.max(this.todaysData, (d) => d.timeStamp)),
+          d3.timeHour.offset(
+            d3.timeDay.floor(d3.max(this.todaysData, (d) => d.timeStamp)),
+            4
+          ),
           d3.timeDay.ceil(d3.max(this.todaysData, (d) => d.timeStamp)),
         ]);
         const maxTime = d3.max(this.todaysData, (d) => d.travelTime);
@@ -71,36 +72,24 @@ export default {
       } else return null;
     },
     path() {
-      if (this.todaysData) {
-        return d3
-          .line()
-          .x((d) => this.scale.x(d.timeStamp))
-          .y((d) => this.scale.y(d.travelTime))
-          .curve(d3.curveCatmullRom.alpha(0.5));
-      } else return null;
+      return d3
+        .line()
+        .x((d) => this.scale.x(d.timeStamp))
+        .y((d) => this.scale.y(d.travelTime))
+        .curve(d3.curveCatmullRom.alpha(0.5));
     },
     path2() {
-      if (this.todaysData) {
-        return d3
-          .line()
-          .x((d) => this.scale.x(d3.timeDay.offset(d.timeStamp, 7)))
-          .y((d) => this.scale.y(d.travelTime))
-          .curve(d3.curveCatmullRom.alpha(0.5));
-      } else return null;
+      return d3
+        .line()
+        .x((d) => this.scale.x(d3.timeDay.offset(d.timeStamp, 7)))
+        .y((d) => this.scale.y(d.travelTime))
+        .curve(d3.curveCatmullRom.alpha(0.5));
     },
     line() {
-      if (this.path) {
-        return this.path(this.todaysData);
-      } else {
-        return null;
-      }
+      return this.path(this.todaysData);
     },
     line2() {
-      if (this.path) {
-        return this.path2(this.lastWeeksData);
-      } else {
-        return null;
-      }
+      return this.path2(this.lastWeeksData);
     },
     viewBox() {
       return `0 0 ${this.width + this.margin.left + this.margin.right} ${this
@@ -114,8 +103,6 @@ export default {
       const axis = binding.arg;
       const axisMethod = { x: "axisBottom", y: "axisLeft" }[axis];
       const methodArg = binding.value[axis];
-
-      // });
       if (axis === "y") {
         d3.select(el).call(
           d3[axisMethod](methodArg).tickFormat((s) => {
@@ -243,39 +230,5 @@ export default {
 
 #linegraph {
   cursor: pointer;
-}
-
-.loading {
-  height: 400px;
-  width: 1600px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 1.3rem;
-}
-
-.lds-dual-ring {
-  display: inline-block;
-  width: 80px;
-  height: 80px;
-}
-.lds-dual-ring:after {
-  content: " ";
-  display: block;
-  width: 64px;
-  height: 64px;
-  margin: 8px;
-  border-radius: 50%;
-  border: 6px solid #fff;
-  border-color: #fff transparent #fff transparent;
-  animation: lds-dual-ring 1.2s linear infinite;
-}
-@keyframes lds-dual-ring {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
 }
 </style>
