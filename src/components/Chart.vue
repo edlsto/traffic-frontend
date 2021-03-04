@@ -1,9 +1,16 @@
 <template>
-  <!-- <div class="loading"><div class="lds-dual-ring"></div></div> -->
   <svg class="chart" :viewBox="viewBox">
     <g :transform="`translate(${this.margin.left}, ${this.margin.top})`">
-      <path :d="line2" class="line-chart__line last-week"></path>
-      <path :d="line" class="line-chart__line"></path>
+      <path
+        v-for="(dataset, index) in dataToChart"
+        :key="index"
+        :d="createLine(dataset)"
+        :class="
+          dataset === todaysData
+            ? 'line-chart__line'
+            : 'line-chart__line last-week'
+        "
+      ></path>
       <g v-axis:x="scale" :transform="`translate(0, ${this.height})`"></g>
       <g v-axis:y="scale"></g>
     </g>
@@ -39,6 +46,15 @@ export default {
     },
   },
   computed: {
+    lastWeekTransposed() {
+      return this.lastWeeksData.map((d) => ({
+        ...d,
+        timeStamp: d.timeStamp + 24 * 60 * 60 * 1000,
+      }));
+    },
+    dataToChart() {
+      return [this.todaysData, this.lastWeekTransposed];
+    },
     rangeX() {
       const width = this.width;
       return [0, width];
@@ -78,14 +94,6 @@ export default {
     line() {
       return this.path(this.todaysData);
     },
-    line2() {
-      return this.path(
-        this.lastWeeksData.map((d) => ({
-          ...d,
-          timeStamp: d.timeStamp + 24 * 60 * 60 * 1000,
-        }))
-      );
-    },
     viewBox() {
       return `0 0 ${this.width + this.margin.left + this.margin.right} ${this
         .height +
@@ -110,11 +118,30 @@ export default {
           })
         );
       } else {
-        d3.select(el).call(d3[axisMethod](methodArg));
+        d3.select(el).call(
+          d3[axisMethod](methodArg).tickFormat((s) => {
+            const dateObj = new Date(s);
+            let hours = dateObj.getHours();
+            let ampm = "am";
+            if (hours === 0) {
+              hours = 12;
+            } else if (hours === 12) {
+              ampm = "pm";
+            } else if (hours > 12) {
+              hours = hours % 12;
+              ampm = "pm";
+            }
+            return `${hours} ${ampm}`;
+          })
+        );
       }
     },
   },
-
+  methods: {
+    createLine(data) {
+      return this.path(data);
+    },
+  },
   // methods: {
   // createGraph() {
   // const svg = d3
