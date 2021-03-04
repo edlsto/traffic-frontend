@@ -18,8 +18,7 @@ export default {
     return {
       speeds: null,
       formatTime: d3.timeFormat("%Y-%m-%d"),
-      margin: { top: 10, right: 30, bottom: 30, left: 60 },
-      // loading: true,
+      margin: { top: 50, right: 30, bottom: 80, left: 60 },
       windowWidth: window.innerWidth,
     };
   },
@@ -218,13 +217,5 @@ export default {
   .line-chart__line {
     stroke-width: 3px;
   }
-}
-
-#chart {
-  position: relative;
-}
-
-#linegraph {
-  cursor: pointer;
 }
 </style>

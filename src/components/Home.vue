@@ -17,14 +17,15 @@
         </h2>
       </div>
     </div>
-    <Chart
-      :todaysData="this.todaysData"
-      :lastWeeksData="this.lastWeeksData"
-      v-if="this.todaysData"
-      class="chart"
-      :width="this.windowWidth"
-      :height="this.windowHeight"
-    />
+    <div class="flex justify-center chart-container" v-if="this.todaysData">
+      <Chart
+        :todaysData="this.todaysData"
+        :lastWeeksData="this.lastWeeksData"
+        class="chart"
+        :width="this.windowW"
+        :height="this.windowHeight"
+      />
+    </div>
     <Spinner class="spinner" v-else :style="{ height: windowHeight + 'px' }" />
     <div v-if="cameraData" class="flex flex-wrap justify-center">
       <div
@@ -70,7 +71,10 @@ export default {
   },
   computed: {
     windowHeight() {
-      return (this.windowWidth * 600) / this.windowWidth;
+      return (this.windowWidth * 500) / this.windowWidth;
+    },
+    windowW() {
+      return this.windowWidth < 800 ? this.windowWidth : 800;
     },
   },
   methods: {
@@ -122,5 +126,9 @@ export default {
 <style scoped>
 .text-center {
   min-height: 100vh;
+}
+
+.chart {
+  max-width: 800px;
 }
 </style>
