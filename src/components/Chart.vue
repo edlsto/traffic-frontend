@@ -63,6 +63,7 @@ export default {
       const height = this.height;
       return [height, 0];
     },
+
     scale() {
       const x = d3.scaleTime().range(this.rangeX);
       const y = d3.scaleLinear().range(this.rangeY);
@@ -73,8 +74,14 @@ export default {
         ),
         d3.timeDay.ceil(d3.max(this.todaysData, (d) => d.timeStamp)),
       ]);
-      const maxTime = d3.max(this.todaysData, (d) => d.travelTime);
-      const minTime = d3.min(this.todaysData, (d) => d.travelTime);
+      const maxTime = d3.max(
+        this.todaysData.concat(this.lastWeeksData),
+        (d) => d.travelTime
+      );
+      const minTime = d3.min(
+        this.todaysData.concat(this.lastWeeksData),
+        (d) => d.travelTime
+      );
       y.domain([
         minTime < 4500 ? minTime : 4500,
         maxTime > 6300 ? maxTime : 6300,

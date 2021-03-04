@@ -4,20 +4,41 @@
       <h1 class="text-6xl sm:text-8xl font-bold">
         I-70 guide
       </h1>
-      <div class="text-lg" v-if="travelTime">
-        <h2 class="text-lg mt-8">
+
+      <select
+        class="w-24 text-gray-700 py-2 px-3 mt-8 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
+        name="animals"
+        v-model="direction"
+      >
+        <option value="East">
+          East
+        </option>
+        <option value="West">
+          West
+        </option>
+      </select>
+
+      <div class="text-lg">
+        <h2 class="text-lg mt-8" v-if="this.direction === 'East'">
           Travel time between Vail and Denver (eastbound) is currently
-          {{ this.travelTime[0].TravelTime[0].Hours[0] }} hour
-          {{ this.travelTime[0].TravelTime[0].Minutes[0] }} minutes
+          <span v-if="this.travelTime">
+            {{ this.travelTime[0].TravelTime[0].Hours[0] }} hour
+            {{ this.travelTime[0].TravelTime[0].Minutes[0] }} minutes
+          </span>
         </h2>
-        <h2 class="text-lg mt-4">
+        <h2 class="text-lg mt-4" v-else>
           Travel time between Denver and Vail (westbound) is currently
-          {{ this.travelTime[1].TravelTime[0].Hours[0] }} hour
-          {{ this.travelTime[1].TravelTime[0].Minutes[0] }} minutes
+          <span v-if="this.travelTime">
+            {{ this.travelTime[1].TravelTime[0].Hours[0] }} hour
+            {{ this.travelTime[1].TravelTime[0].Minutes[0] }} minutes
+          </span>
         </h2>
       </div>
     </div>
-    <div class="flex justify-center chart-container" v-if="this.todaysData">
+    <div
+      class="flex justify-center chart-container"
+      v-if="this.todaysData && this.lastWeeksData"
+    >
       <Chart
         :todaysData="this.todaysData"
         :lastWeeksData="this.lastWeeksData"
@@ -64,9 +85,10 @@ export default {
       baseURL: "http://www.cotrip.org/",
       travelTime: null,
       historicalData: null,
-      todaysData: null,
-      lastWeeksData: null,
+      todaysSpeeds: null,
+      lastWeeksSpeeds: null,
       windowWidth: window.innerWidth,
+      direction: "East",
     };
   },
   computed: {
@@ -76,6 +98,24 @@ export default {
     windowW() {
       return this.windowWidth < 800 ? this.windowWidth : 800;
     },
+    todaysData() {
+      if (this.todaysSpeeds) {
+        return this.parseData(
+          this.todaysSpeeds.filter((d) => d.direction === this.direction)
+        );
+      } else {
+        return null;
+      }
+    },
+    lastWeeksData() {
+      if (this.lastWeeksSpeeds) {
+        return this.parseData(
+          this.lastWeeksSpeeds.filter((d) => d.direction === this.direction)
+        );
+      } else {
+        return null;
+      }
+    },
   },
   methods: {
     formatTime(rawTime) {
@@ -84,9 +124,18 @@ export default {
     onResize() {
       this.windowWidth = window.innerWidth;
     },
+    parseData(data) {
+      return data
+        .filter((d) => d.travelTime !== -1)
+        .map((d) => ({
+          timeStamp: Date.parse(d.timeStamp),
+          travelTime: parseInt(d.travelTime),
+        }));
+    },
   },
   mounted() {
     window.addEventListener("resize", this.onResize);
+    this.direction = new Date().getHours() < 12 ? "West" : "East";
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.onResize);
@@ -100,21 +149,12 @@ export default {
       axios.get("https://edwardisthe.best/speed").then((response) => {
         this.travelTime = response.data;
       });
-      let todaysSpeeds = await axios.get("https://edwardisthe.best/today");
-      let lastWeeksSpeeds = await axios.get(
+      const todaysSpeeds = await axios.get("https://edwardisthe.best/today");
+      this.todaysSpeeds = todaysSpeeds.data;
+      const lastWeeksSpeeds = await axios.get(
         "https://edwardisthe.best/lastweek"
       );
-
-      const parseData = (data) =>
-        data.data
-          .filter((d) => d.direction === "West")
-          .filter((d) => d.travelTime !== -1)
-          .map((d) => ({
-            timeStamp: Date.parse(d.timeStamp),
-            travelTime: parseInt(d.travelTime),
-          }));
-      this.todaysData = parseData(todaysSpeeds);
-      this.lastWeeksData = parseData(lastWeeksSpeeds);
+      this.lastWeeksSpeeds = lastWeeksSpeeds.data;
     } catch (error) {
       console.log(error);
     }
