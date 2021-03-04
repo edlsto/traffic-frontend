@@ -54,7 +54,7 @@ export default {
       x.domain([
         d3.timeHour.offset(
           d3.timeDay.floor(d3.max(this.todaysData, (d) => d.timeStamp)),
-          4
+          3
         ),
         d3.timeDay.ceil(d3.max(this.todaysData, (d) => d.timeStamp)),
       ]);
@@ -76,18 +76,16 @@ export default {
         .y((d) => this.scale.y(d.travelTime))
         .curve(d3.curveCatmullRom.alpha(0.5));
     },
-    path2() {
-      return d3
-        .line()
-        .x((d) => this.scale.x(d3.timeDay.offset(d.timeStamp, 7)))
-        .y((d) => this.scale.y(d.travelTime))
-        .curve(d3.curveCatmullRom.alpha(0.5));
-    },
     line() {
       return this.path(this.todaysData);
     },
     line2() {
-      return this.path2(this.lastWeeksData);
+      return this.path(
+        this.lastWeeksData.map((d) => ({
+          ...d,
+          timeStamp: d.timeStamp + 24 * 60 * 60 * 1000,
+        }))
+      );
     },
     viewBox() {
       return `0 0 ${this.width + this.margin.left + this.margin.right} ${this
