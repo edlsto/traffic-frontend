@@ -47,7 +47,6 @@
 </template>
 
 <script>
-import * as d3 from "d3";
 import axios from "axios";
 import moment from "moment";
 import Chart from "./Chart";
@@ -88,39 +87,30 @@ export default {
   beforeDestroy() {
     window.removeEventListener("resize", this.onResize);
   },
+  async getSpeeds() {},
   async created() {
     try {
-      const cameraData = await axios.get("https://edwardisthe.best/photos");
-      this.cameraData = cameraData.data;
-      const travelTime = await axios.get("https://edwardisthe.best/speed");
-      this.travelTime = travelTime.data;
-      let historical = await axios.get("https://edwardisthe.best/historical");
-      this.loading = false;
-      const speeds = historical.data
-        .filter((d) => d.direction === "East")
-        .filter((d) => d.travelTime !== "-1")
-        .map((d) => ({
-          timeStamp: Date.parse(d.timeStamp),
-          travelTime: parseInt(d.travelTime),
-        }));
-      this.speeds = speeds;
-      this.todaysData = speeds.filter((datapoint) => {
-        return (
-          datapoint.timeStamp >
-          d3.timeHour.offset(d3.timeDay.floor(new Date()), 4)
-        );
+      axios.get("https://edwardisthe.best/photos").then((response) => {
+        this.cameraData = response.data;
       });
-      this.lastWeeksData = speeds.filter((datapoint) => {
-        return (
-          datapoint.timeStamp >
-            d3.timeHour.offset(
-              d3.timeDay.floor(d3.timeDay.offset(new Date(), -7)),
-              4
-            ) &&
-          datapoint.timeStamp <
-            d3.timeDay.floor(d3.timeDay.offset(new Date(), -6))
-        );
+      axios.get("https://edwardisthe.best/speed").then((response) => {
+        this.travelTime = response.data;
       });
+      let todaysSpeeds = await axios.get("https://edwardisthe.best/today");
+      let lastWeeksSpeeds = await axios.get(
+        "https://edwardisthe.best/lastweek"
+      );
+
+      const parseData = (data) =>
+        data.data
+          .filter((d) => d.direction === "West")
+          .filter((d) => d.travelTime !== -1)
+          .map((d) => ({
+            timeStamp: Date.parse(d.timeStamp),
+            travelTime: parseInt(d.travelTime),
+          }));
+      this.todaysData = parseData(todaysSpeeds);
+      this.lastWeeksData = parseData(lastWeeksSpeeds);
     } catch (error) {
       console.log(error);
     }
@@ -132,9 +122,5 @@ export default {
 <style scoped>
 .text-center {
   min-height: 100vh;
-}
-
-.chart {
-  /* max-width: 800px; */
 }
 </style>
