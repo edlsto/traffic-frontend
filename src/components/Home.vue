@@ -79,7 +79,7 @@ export default {
   data() {
     return {
       cameraData: null,
-      baseURL: "http://www.cotrip.org/",
+      baseURL: "https://www.cotrip.org/",
       travelTime: null,
       historicalData: null,
       todaysSpeeds: null,
@@ -167,10 +167,10 @@ export default {
 
 .chart {
   max-width: 800px;
+  margin: auto;
 }
 
 .chart-container {
   display: block;
-  margin: auto;
 }
 </style>
