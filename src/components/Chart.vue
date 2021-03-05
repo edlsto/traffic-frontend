@@ -147,6 +147,9 @@ export default {
       return this.path(data);
     },
   },
+  created() {
+    console.log("created!");
+  },
   // methods: {
   // createGraph() {
   // const svg = d3
