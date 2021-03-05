@@ -173,4 +173,10 @@ export default {
   display: flex;
   justify-content: center;
 }
+
+@media only screen and (max-width: 600px) {
+  .chart-container {
+    display: block;
+  }
+}
 </style>
