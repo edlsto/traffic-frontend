@@ -168,4 +168,9 @@ export default {
 .chart {
   max-width: 800px;
 }
+
+.chart-container {
+  display: flex;
+  justify-content: center;
+}
 </style>
