@@ -1,6 +1,6 @@
 <template>
-  <div>
-    <div>
+  <div class="text-center h-full">
+    <div class="font-sans-serif pt-12 text-gray-700">
       <!-- <h1 class="text-6xl sm:text-8xl font-bold">
         I-70 guide
       </h1> -->
@@ -36,7 +36,10 @@
         </h2>
       </div> -->
     </div>
-    <div v-if="this.todaysData && this.lastWeeksData">
+    <div
+      class="flex justify-center chart-container"
+      v-if="this.todaysData && this.lastWeeksData"
+    >
       <Chart
         :todaysData="this.todaysData"
         :lastWeeksData="this.lastWeeksData"
@@ -163,12 +166,12 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-/* .text-center {
+.text-center {
   min-height: 100vh;
 }
 
 .chart {
   max-width: 800px;
   z-index: 1;
-} */
+}
 </style>
