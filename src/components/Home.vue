@@ -36,10 +36,7 @@
         </h2>
       </div> -->
     </div>
-    <div
-      class="flex justify-center chart-container"
-      v-if="this.todaysData && this.lastWeeksData"
-    >
+    <div v-if="this.todaysData && this.lastWeeksData">
       <Chart
         :todaysData="this.todaysData"
         :lastWeeksData="this.lastWeeksData"
