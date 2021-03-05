@@ -1,11 +1,11 @@
 <template>
-  <div class="text-center bg-gray-200 h-full">
-    <div class="font-sans-serif pt-12 text-gray-700">
+  <div>
+    <div>
       <!-- <h1 class="text-6xl sm:text-8xl font-bold">
         I-70 guide
       </h1> -->
 
-      <select
+      <!-- <select
         class="w-24 text-gray-700 py-2 px-3 mt-8 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
         name="directions"
         v-model="direction"
@@ -16,7 +16,7 @@
         <option value="West">
           West
         </option>
-      </select>
+      </select> -->
 
       <!-- 
       <div class="text-lg">
@@ -36,10 +36,7 @@
         </h2>
       </div> -->
     </div>
-    <div
-      class="flex justify-center chart-container"
-      v-if="this.todaysData && this.lastWeeksData"
-    >
+    <div v-if="this.todaysData && this.lastWeeksData">
       <Chart
         :todaysData="this.todaysData"
         :lastWeeksData="this.lastWeeksData"
@@ -166,12 +163,12 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.text-center {
+/* .text-center {
   min-height: 100vh;
 }
 
 .chart {
   max-width: 800px;
   z-index: 1;
-}
+} */
 </style>
