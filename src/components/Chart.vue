@@ -252,9 +252,9 @@ export default {
   opacity: 0.2;
 }
 
-@media only screen and (max-width: 600px) {
+/* @media only screen and (max-width: 600px) {
   .line-chart__line {
     stroke-width: 3px;
   }
-}
+} */
 </style>
