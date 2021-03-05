@@ -1,5 +1,5 @@
 <template>
-  <div class="text-center h-full">
+  <div>
     <div>
       <!-- <h1 class="text-6xl sm:text-8xl font-bold">
         I-70 guide
