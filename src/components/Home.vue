@@ -137,7 +137,6 @@ export default {
   mounted() {
     window.addEventListener("resize", this.onResize);
     this.direction = new Date().getHours() < 12 ? "West" : "East";
-    console.log(window.innerWidth);
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.onResize);
@@ -150,13 +149,13 @@ export default {
       });
       axios.get("https://edwardisthe.best/speed").then((response) => {
         this.travelTime = response.data;
-        console.log(this.travelTime);
       });
       const todaysSpeeds = await axios.get("https://edwardisthe.best/today");
       this.todaysSpeeds = todaysSpeeds.data;
       const lastWeeksSpeeds = await axios.get(
         "https://edwardisthe.best/lastweek"
       );
+      console.log(this.todaysSpeeds[0].travelTime);
       this.lastWeeksSpeeds = lastWeeksSpeeds.data;
     } catch (error) {
       console.log(error);

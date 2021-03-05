@@ -1,18 +1,5 @@
 <template>
   <svg class="chart" :viewBox="viewBox" xmlns="http://www.w3.org/2000/svg">
-    <svg
-      viewBox="0 0 300 100"
-      xmlns="http://www.w3.org/2000/svg"
-      stroke="red"
-      fill="grey"
-    >
-      <circle cx="50" cy="50" r="40" />
-      <circle cx="150" cy="50" r="4" />
-
-      <svg viewBox="0 0 10 10" x="200" width="100">
-        <circle cx="5" cy="5" r="4" />
-      </svg>
-    </svg>
     <g :transform="`translate(${this.margin.left}, ${this.margin.top})`">
       <path
         v-for="(dataset, index) in dataToChart"
@@ -113,6 +100,12 @@ export default {
       return this.path(this.todaysData);
     },
     viewBox() {
+      console.log(
+        `0 0 ${this.width + this.margin.left + this.margin.right} ${this
+          .height +
+          this.margin.bottom +
+          this.margin.top}`
+      );
       return `0 0 ${this.width + this.margin.left + this.margin.right} ${this
         .height +
         this.margin.bottom +
@@ -160,13 +153,7 @@ export default {
       return this.path(data);
     },
   },
-  created() {
-    console.log("created!");
-  },
-  mounted() {
-    console.log("mounted!");
-    console.log(this.$el.firstChild.firstChild);
-  },
+
   // methods: {
   // createGraph() {
   // const svg = d3
