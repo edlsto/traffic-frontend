@@ -172,5 +172,6 @@ export default {
 
 .chart {
   max-width: 800px;
+  z-index: 1;
 }
 </style>
