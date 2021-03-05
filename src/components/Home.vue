@@ -1,13 +1,13 @@
 <template>
-  <div>
-    <div>
-      <!-- <h1 class="text-6xl sm:text-8xl font-bold">
+  <div class="text-center bg-gray-200 h-full">
+    <div class="font-sans-serif pt-12 text-gray-700">
+      <h1 class="text-6xl sm:text-8xl font-bold">
         I-70 guide
-      </h1> -->
+      </h1>
 
-      <!-- <select
+      <select
         class="w-24 text-gray-700 py-2 px-3 mt-8 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-        name="directions"
+        name="animals"
         v-model="direction"
       >
         <option value="East">
@@ -16,9 +16,8 @@
         <option value="West">
           West
         </option>
-      </select> -->
+      </select>
 
-      <!-- 
       <div class="text-lg">
         <h2 class="text-lg mt-8" v-if="this.direction === 'East'">
           Travel time between Vail and Denver (eastbound) is currently
@@ -34,9 +33,9 @@
             {{ this.travelTime[1].TravelTime[0].Minutes[0] }} minutes
           </span>
         </h2>
-      </div> -->
+      </div>
     </div>
-    <div v-if="this.todaysData && this.lastWeeksData">
+    <div class="chart-container" v-if="this.todaysData && this.lastWeeksData">
       <Chart
         :todaysData="this.todaysData"
         :lastWeeksData="this.lastWeeksData"
@@ -45,8 +44,8 @@
         :height="this.windowHeight"
       />
     </div>
-    <!-- <Spinner class="spinner" v-else :style="{ height: windowHeight + 'px' }" /> -->
-    <!-- <div v-if="cameraData" class="flex flex-wrap justify-center">
+    <Spinner class="spinner" v-else :style="{ height: windowHeight + 'px' }" />
+    <div v-if="cameraData" class="flex flex-wrap justify-center">
       <div
         v-for="(image, index) in cameraData.CameraView"
         :key="index"
@@ -62,7 +61,7 @@
           </p>
         </div>
       </div>
-    </div> -->
+    </div>
   </div>
 </template>
 
@@ -70,12 +69,12 @@
 import axios from "axios";
 import moment from "moment";
 import Chart from "./Chart";
-// import Spinner from "./Spinner";
+import Spinner from "./Spinner";
 export default {
   name: "Home",
   components: {
     Chart,
-    // Spinner,
+    Spinner,
   },
   data() {
     return {
@@ -152,7 +151,6 @@ export default {
       const lastWeeksSpeeds = await axios.get(
         "https://edwardisthe.best/lastweek"
       );
-      console.log(this.todaysSpeeds[0].travelTime);
       this.lastWeeksSpeeds = lastWeeksSpeeds.data;
     } catch (error) {
       console.log(error);
@@ -164,10 +162,10 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .text-center {
-  /* min-height: 100vh; */
+  min-height: 100vh;
 }
 
 .chart {
-  /* max-width: 800px; */
+  max-width: 800px;
 }
 </style>

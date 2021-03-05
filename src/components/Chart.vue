@@ -1,5 +1,5 @@
 <template>
-  <svg class="chart" :viewBox="viewBox" xmlns="http://www.w3.org/2000/svg">
+  <svg class="chart" :viewBox="viewBox">
     <g :transform="`translate(${this.margin.left}, ${this.margin.top})`">
       <path
         v-for="(dataset, index) in dataToChart"
@@ -37,9 +37,11 @@ export default {
       required: true,
     },
     width: {
+      default: 600,
       type: Number,
     },
     height: {
+      default: 200,
       type: Number,
     },
   },
@@ -100,12 +102,6 @@ export default {
       return this.path(this.todaysData);
     },
     viewBox() {
-      console.log(
-        `0 0 ${this.width + this.margin.left + this.margin.right} ${this
-          .height +
-          this.margin.bottom +
-          this.margin.top}`
-      );
       return `0 0 ${this.width + this.margin.left + this.margin.right} ${this
         .height +
         this.margin.bottom +
@@ -153,7 +149,6 @@ export default {
       return this.path(data);
     },
   },
-
   // methods: {
   // createGraph() {
   // const svg = d3
@@ -252,9 +247,9 @@ export default {
   opacity: 0.2;
 }
 
-/* @media only screen and (max-width: 600px) {
+@media only screen and (max-width: 600px) {
   .line-chart__line {
     stroke-width: 3px;
   }
-} */
+}
 </style>
