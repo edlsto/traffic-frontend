@@ -1,6 +1,6 @@
 <template>
   <div class="text-center h-full">
-    <div class="font-sans-serif pt-12 text-gray-700">
+    <div>
       <!-- <h1 class="text-6xl sm:text-8xl font-bold">
         I-70 guide
       </h1> -->
@@ -172,6 +172,5 @@ export default {
 
 .chart {
   /* max-width: 800px; */
-  z-index: 1;
 }
 </style>
