@@ -1,9 +1,9 @@
 <template>
   <div class="text-center bg-gray-200 h-full">
     <div class="font-sans-serif pt-12 text-gray-700">
-      <h1 class="text-6xl sm:text-8xl font-bold">
+      <!-- <h1 class="text-6xl sm:text-8xl font-bold">
         I-70 guide
-      </h1>
+      </h1> -->
 
       <select
         class="w-24 text-gray-700 py-2 px-3 mt-8 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
@@ -17,7 +17,7 @@
           West
         </option>
       </select>
-
+      <!-- 
       <div class="text-lg">
         <h2 class="text-lg mt-8" v-if="this.direction === 'East'">
           Travel time between Vail and Denver (eastbound) is currently
@@ -33,7 +33,7 @@
             {{ this.travelTime[1].TravelTime[0].Minutes[0] }} minutes
           </span>
         </h2>
-      </div>
+      </div> -->
     </div>
     <div
       class="flex justify-center chart-container"
@@ -48,7 +48,7 @@
       />
     </div>
     <Spinner class="spinner" v-else :style="{ height: windowHeight + 'px' }" />
-    <div v-if="cameraData" class="flex flex-wrap justify-center">
+    <!-- <div v-if="cameraData" class="flex flex-wrap justify-center">
       <div
         v-for="(image, index) in cameraData.CameraView"
         :key="index"
@@ -64,7 +64,7 @@
           </p>
         </div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
