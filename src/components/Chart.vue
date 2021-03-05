@@ -150,6 +150,10 @@ export default {
   created() {
     console.log("created!");
   },
+  mounted() {
+    console.log("mounted!");
+    console.log(this.$el);
+  },
   // methods: {
   // createGraph() {
   // const svg = d3
