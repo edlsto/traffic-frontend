@@ -37,11 +37,9 @@ export default {
       required: true,
     },
     width: {
-      default: 600,
       type: Number,
     },
     height: {
-      default: 200,
       type: Number,
     },
   },

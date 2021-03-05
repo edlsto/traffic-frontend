@@ -7,7 +7,7 @@
 
       <select
         class="w-24 text-gray-700 py-2 px-3 mt-8 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-        name="animals"
+        name="directions"
         v-model="direction"
       >
         <option value="East">
@@ -136,6 +136,7 @@ export default {
   mounted() {
     window.addEventListener("resize", this.onResize);
     this.direction = new Date().getHours() < 12 ? "West" : "East";
+    console.log(window.innerWidth);
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.onResize);
