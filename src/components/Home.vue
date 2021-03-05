@@ -47,7 +47,7 @@
         :height="this.windowHeight"
       />
     </div>
-    <Spinner class="spinner" v-else :style="{ height: windowHeight + 'px' }" />
+    <!-- <Spinner class="spinner" v-else :style="{ height: windowHeight + 'px' }" /> -->
     <!-- <div v-if="cameraData" class="flex flex-wrap justify-center">
       <div
         v-for="(image, index) in cameraData.CameraView"
@@ -72,12 +72,12 @@
 import axios from "axios";
 import moment from "moment";
 import Chart from "./Chart";
-import Spinner from "./Spinner";
+// import Spinner from "./Spinner";
 export default {
   name: "Home",
   components: {
     Chart,
-    Spinner,
+    // Spinner,
   },
   data() {
     return {
