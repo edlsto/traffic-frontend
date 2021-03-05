@@ -152,7 +152,7 @@ export default {
   },
   mounted() {
     console.log("mounted!");
-    console.log(this.$el);
+    console.log(this.$el.firstChild.firstChild);
   },
   // methods: {
   // createGraph() {
