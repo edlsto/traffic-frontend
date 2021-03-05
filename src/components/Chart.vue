@@ -1,5 +1,10 @@
 <template>
-  <svg class="chart" :viewBox="viewBox">
+  <svg
+    class="chart"
+    :viewBox="viewBox"
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+  >
     <g :transform="`translate(${this.margin.left}, ${this.margin.top})`">
       <path
         v-for="(dataset, index) in dataToChart"

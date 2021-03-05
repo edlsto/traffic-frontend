@@ -26,7 +26,7 @@
             {{ this.travelTime[0].TravelTime[0].Minutes[0] }} minutes
           </span>
         </h2>
-        <h2 class="text-lg mt-4" v-else>
+        <h2 class="text-lg mt-8" v-else>
           Travel time between Denver and Vail (westbound) is currently
           <span v-if="this.travelTime">
             {{ this.travelTime[1].TravelTime[0].Hours[0] }} hour
@@ -148,6 +148,7 @@ export default {
       });
       axios.get("https://edwardisthe.best/speed").then((response) => {
         this.travelTime = response.data;
+        console.log(this.travelTime);
       });
       const todaysSpeeds = await axios.get("https://edwardisthe.best/today");
       this.todaysSpeeds = todaysSpeeds.data;
