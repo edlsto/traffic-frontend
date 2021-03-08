@@ -16,7 +16,7 @@
       <g class="focus">
         <line class="x-hover-line hover-line" :y1="0" :y2="500"></line>
         <line class="y-hover-line hover-line" :x1="width" :x2="width"></line>
-        <circle r="7.5"></circle>
+        <circle r="5"></circle>
         <text x="15" dy=".31em"></text>
       </g>
     </g>
@@ -170,7 +170,6 @@ export default {
       const d1 = this.todaysData[i];
       if (d1) {
         const d = x0 - d0.timeStamp > d1.timeStamp - x0 ? d1 : d0;
-        console.log(d);
         focus.attr(
           "transform",
           "translate(" +
@@ -180,7 +179,7 @@ export default {
             ")"
         );
         focus.select("text").text(function() {
-          return d.value;
+          return d.travelTime;
         });
         focus
           .select(".x-hover-line")
@@ -190,16 +189,13 @@ export default {
     },
   },
   mounted() {
-    console.log(this.height);
     const focus = d3.select(".focus");
     d3.select(".overlay")
       .on("mouseover", function() {
         focus.style("display", "inline");
-        console.log("mouse over");
       })
       .on("mouseout", function() {
         focus.style("display", "none");
-        console.log("mouse out");
       })
       .on("mousemove", this.mousemove);
   },
@@ -312,9 +308,7 @@ export default {
 }
 
 .focus circle {
-  fill: #f1f3f3;
-  stroke: #6f257f;
-  stroke-width: 5px;
+  fill: steelblue;
 }
 
 .hover-line {
