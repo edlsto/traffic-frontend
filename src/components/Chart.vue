@@ -123,20 +123,15 @@ export default {
     },
   },
   directives: {
-    axis(el, binding) {
+    axis(el, binding, vnode) {
       const axis = binding.arg;
       const axisMethod = { x: "axisBottom", y: "axisLeft" }[axis];
       const methodArg = binding.value[axis];
       if (axis === "y") {
         d3.select(el).call(
-          d3[axisMethod](methodArg).tickFormat((s) => {
-            const dateObj = new Date(s * 1000);
-            const hours = dateObj.getUTCHours();
-            const minutes = dateObj.getUTCMinutes();
-            const timeString =
-              hours + ":" + minutes.toString().padStart(2, "0");
-            return timeString;
-          })
+          d3[axisMethod](methodArg).tickFormat(
+            vnode.context.convertSecondsToTimeString
+          )
         );
       } else {
         d3.select(el).call(
@@ -162,7 +157,15 @@ export default {
     createLine(data) {
       return this.path(data);
     },
+    convertSecondsToTimeString(s) {
+      const dateObj = new Date(s * 1000);
+      const hours = dateObj.getUTCHours();
+      const minutes = dateObj.getUTCMinutes();
+      const timeString = hours + ":" + minutes.toString().padStart(2, "0");
+      return timeString;
+    },
     mousemove(e) {
+      const that = this;
       const focus = d3.select(".focus");
       const x0 = this.scale.x.invert(d3.pointer(e)[0]);
       const i = this.bisectDate(this.todaysData, x0, 1);
@@ -179,7 +182,7 @@ export default {
             ")"
         );
         focus.select("text").text(function() {
-          return d.travelTime;
+          return that.convertSecondsToTimeString(d.travelTime);
         });
         focus
           .select(".x-hover-line")
@@ -199,89 +202,6 @@ export default {
       })
       .on("mousemove", this.mousemove);
   },
-  // methods: {
-  // createGraph() {
-  // const svg = d3
-  //   .select("#chart")
-  //   .append("svg")
-  //   .style("position", "relative")
-  //   .attr("width", this.width + this.margin.left + this.margin.right)
-  //   .attr("height", this.height + this.margin.top + this.margin.bottom)
-
-  // .append("g")
-  // .attr(
-  //   "transform",
-  //   "translate(" + this.margin.left + "," + this.margin.top + ")"
-  // );
-
-  // svg
-  //   .append("g")
-  //   .attr("transform", "translate(0," + this.height + ")")
-  //   .call()
-  //   .style("position", "relative");
-
-  // svg.append("g").call();
-
-  // svg
-  //   .append("path")
-  //   .attr("id", "lineGraph")
-  //   .datum(this.todaysData)
-  //   .attr("fill", "none")
-  //   .attr("stroke", "steelblue")
-  //   .attr("stroke-width", 4)
-  //   .attr("opacity", 0.7)
-  //   .attr("cursor", "pointer")
-  //   .attr("d");
-
-  // svg
-  //   .append("path")
-  //   .attr("id", "lastWeeksData")
-  //   .datum(this.lastWeeksData)
-  //   .attr("fill", "none")
-  //   .attr("stroke", "steelblue")
-  //   .attr("stroke-width", 4)
-  //   .attr("opacity", 0.3)
-  //   .attr("cursor", "pointer")
-  //   .attr(
-  //     "d",
-  //     d3
-  //       .line()
-  //       .x((d) => x(d3.timeDay.offset(d.timeStamp, 7)))
-  //       .y((d) => y(d.travelTime))
-  //       .curve(d3.curveCatmullRom.alpha(0.5))
-  //       );
-
-  //     const tooltip = d3
-  //       .select("#chart")
-  //       .append("div")
-  //       .style("position", "absolute")
-  //       .style("visibility", "visible")
-  //       .style("background-color", "red")
-  //       .style("top", "0")
-  //       .text("Hello");
-
-  //     d3.select("#lineGraph").on("mouseover", () => {
-  //       tooltip.style("visibility", "visible");
-  //     });
-
-  //     d3.select("#lineGraph").on("mouseout", () => {
-  //       tooltip.style("visibility", "hidden");
-  //     });
-
-  //     d3.select("#lineGraph").on("mousemove", (e) => {
-  //       let yCoor = d3.pointer(e)[1];
-  //       let seconds = y.invert(yCoor);
-  //       const dateObj = new Date(seconds * 1000);
-  //       const hours = dateObj.getUTCHours();
-  //       const minutes = dateObj.getUTCMinutes();
-  //       const timeString = hours + ":" + minutes.toString().padStart(2, "0");
-  //       tooltip
-  //         .text(timeString)
-  //         .style("left", d3.pointer(e)[0] + 60 + "px")
-  //         .style("top", d3.pointer(e)[1] + "px");
-  //     });
-  //   },
-  // },
 };
 </script>
 
