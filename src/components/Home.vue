@@ -45,43 +45,52 @@
       />
     </div>
     <Spinner class="spinner" v-else :style="{ height: windowHeight + 'px' }" />
-    <div v-if="cameraData" class="flex flex-wrap justify-center">
-      <div
-        v-for="(image, index) in cameraData.CameraView"
-        :key="index"
-        class="p-4 rounded bg-white m-4 shadow"
-      >
-        <img :src="baseURL + image.ImageLocation" alt="" />
-        <div class="text-left">
-          <p class="pt-4 font-bold text-left text-blue-600">
-            {{ image.CameraName[0] }}
-          </p>
-          <p class="text-xs uppercase">
-            Last updated: {{ formatTime(image.LastUpdatedDate[0]) }}
-          </p>
-        </div>
-      </div>
+    <div class="gallery justify-center">
+      <Card class="gallery justify-center" :cameraData="cameraData.genesee"
+        >1.1 mi E of Genesee Park Int
+      </Card>
+      <Card class="gallery justify-center" :cameraData="cameraData.copper"
+        >CO-91 Copper Mtn
+      </Card>
+      <Card class="gallery justify-center" :cameraData="cameraData.beaverBrook"
+        >Beaver Brook Int - EB
+      </Card>
+      <Card class="gallery justify-center" :cameraData="cameraData.vMTnl"
+        >0.6 mi W of VM Tnl
+      </Card>
+      <Card class="gallery justify-center" :cameraData="cameraData.fifteenth"
+        >0.1 mi E of 15th St
+      </Card>
+      <Card class="gallery justify-center" :cameraData="cameraData.vailPass"
+        >0.2 mi W of Vail Pass Summit
+      </Card>
     </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
-import moment from "moment";
 import Chart from "./Chart";
+import Card from "./Card";
 import Spinner from "./Spinner";
 export default {
   name: "Home",
   components: {
     Chart,
     Spinner,
+    Card,
   },
   data() {
     return {
-      cameraData: null,
-      baseURL: "https://www.cotrip.org/",
+      cameraData: {
+        genesee: {},
+        copper: {},
+        beaverBrook: {},
+        vMTnl: {},
+        fifteenth: {},
+        vailPass: {},
+      },
       travelTime: null,
-      historicalData: null,
       todaysSpeeds: null,
       lastWeeksSpeeds: null,
       windowWidth: window.innerWidth,
@@ -115,9 +124,6 @@ export default {
     },
   },
   methods: {
-    formatTime(rawTime) {
-      return moment(rawTime).format("h:mm a MMM. D");
-    },
     onResize() {
       this.windowWidth = window.innerWidth;
     },
@@ -141,7 +147,15 @@ export default {
   async created() {
     try {
       axios.get("https://edwardisthe.best/photos").then((response) => {
-        this.cameraData = response.data;
+        console.log(response.data);
+        this.cameraData = {
+          genesee: response.data.CameraView[0],
+          copper: response.data.CameraView[1],
+          beaverBrook: response.data.CameraView[2],
+          vMTnl: response.data.CameraView[3],
+          fifteenth: response.data.CameraView[4],
+          vailPass: response.data.CameraView[7],
+        };
       });
       axios.get("https://edwardisthe.best/speed").then((response) => {
         this.travelTime = response.data;
@@ -172,5 +186,10 @@ export default {
 
 .chart-container {
   display: block;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 400px));
 }
 </style>

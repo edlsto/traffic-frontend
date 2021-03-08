@@ -14,8 +14,8 @@
       <g v-axis:x="scale" :transform="`translate(0, ${this.height})`"></g>
       <g v-axis:y="scale"></g>
       <g class="focus">
-        <line class="x-hover-line hover-line" :y1="0" :y2="500"></line>
-        <line class="y-hover-line hover-line" :x1="width" :x2="width"></line>
+        <line class="x-hover-line hover-line" :y1="0" :y2="height"></line>
+        <line class="y-hover-line hover-line" :x1="0" :x2="width"></line>
         <circle r="5"></circle>
         <text x="15" dy=".31em"></text>
       </g>
@@ -36,7 +36,6 @@ export default {
   data() {
     return {
       speeds: null,
-      formatTime: d3.timeFormat("%Y-%m-%d"),
       margin: { top: 50, right: 30, bottom: 80, left: 60 },
       bisectDate: d3.bisector(function(d) {
         return d.timeStamp;
@@ -51,11 +50,9 @@ export default {
       required: true,
     },
     width: {
-      default: 600,
       type: Number,
     },
     height: {
-      default: 200,
       type: Number,
     },
   },
@@ -77,7 +74,6 @@ export default {
       const height = this.height;
       return [height, 0];
     },
-
     scale() {
       const x = d3.scaleTime().range(this.rangeX);
       const y = d3.scaleLinear().range(this.rangeY);
@@ -135,20 +131,9 @@ export default {
         );
       } else {
         d3.select(el).call(
-          d3[axisMethod](methodArg).tickFormat((s) => {
-            const dateObj = new Date(s);
-            let hours = dateObj.getHours();
-            let ampm = "am";
-            if (hours === 0) {
-              hours = 12;
-            } else if (hours === 12) {
-              ampm = "pm";
-            } else if (hours > 12) {
-              hours = hours % 12;
-              ampm = "pm";
-            }
-            return `${hours} ${ampm}`;
-          })
+          d3[axisMethod](methodArg).tickFormat(
+            vnode.context.convertTimeStampToTimeOfDayString
+          )
         );
       }
     },
@@ -163,6 +148,20 @@ export default {
       const minutes = dateObj.getUTCMinutes();
       const timeString = hours + ":" + minutes.toString().padStart(2, "0");
       return timeString;
+    },
+    convertTimeStampToTimeOfDayString(s) {
+      const dateObj = new Date(s);
+      let hours = dateObj.getHours();
+      let ampm = "am";
+      if (hours === 0) {
+        hours = 12;
+      } else if (hours === 12) {
+        ampm = "pm";
+      } else if (hours > 12) {
+        hours = hours % 12;
+        ampm = "pm";
+      }
+      return `${hours} ${ampm}`;
     },
     mousemove(e) {
       const that = this;
@@ -187,7 +186,7 @@ export default {
         focus
           .select(".x-hover-line")
           .attr("y2", this.height - this.scale.y(d.travelTime));
-        focus.select(".y-hover-line").attr("x2", this.width + this.width);
+        focus.select(".y-hover-line").attr("x2", this.width);
       }
     },
   },
@@ -232,9 +231,9 @@ export default {
 }
 
 .hover-line {
-  stroke: #6f257f;
+  stroke: steelblue;
   stroke-width: 2px;
-  stroke-dasharray: 3, 3;
+  opacity: 0.2;
 }
 
 @media only screen and (max-width: 600px) {
