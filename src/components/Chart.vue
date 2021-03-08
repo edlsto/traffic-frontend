@@ -13,7 +13,19 @@
       ></path>
       <g v-axis:x="scale" :transform="`translate(0, ${this.height})`"></g>
       <g v-axis:y="scale"></g>
+      <g class="focus">
+        <line class="x-hover-line hover-line" :y1="0" :y2="500"></line>
+        <line class="y-hover-line hover-line" :x1="width" :x2="width"></line>
+        <circle r="5"></circle>
+        <text x="15" dy=".31em"></text>
+      </g>
     </g>
+    <rect
+      class="overlay"
+      :transform="`translate(${this.margin.left}, ${this.margin.top})`"
+      :width="width"
+      :height="height"
+    ></rect>
   </svg>
 </template>
 
@@ -26,7 +38,9 @@ export default {
       speeds: null,
       formatTime: d3.timeFormat("%Y-%m-%d"),
       margin: { top: 50, right: 30, bottom: 80, left: 60 },
-      windowWidth: window.innerWidth,
+      bisectDate: d3.bisector(function(d) {
+        return d.timeStamp;
+      }).left,
     };
   },
   props: {
@@ -148,6 +162,42 @@ export default {
     createLine(data) {
       return this.path(data);
     },
+    mousemove(e) {
+      const focus = d3.select(".focus");
+      const x0 = this.scale.x.invert(d3.pointer(e)[0]);
+      const i = this.bisectDate(this.todaysData, x0, 1);
+      const d0 = this.todaysData[i - 1];
+      const d1 = this.todaysData[i];
+      if (d1) {
+        const d = x0 - d0.timeStamp > d1.timeStamp - x0 ? d1 : d0;
+        focus.attr(
+          "transform",
+          "translate(" +
+            this.scale.x(d.timeStamp) +
+            "," +
+            this.scale.y(d.travelTime) +
+            ")"
+        );
+        focus.select("text").text(function() {
+          return d.travelTime;
+        });
+        focus
+          .select(".x-hover-line")
+          .attr("y2", this.height - this.scale.y(d.travelTime));
+        focus.select(".y-hover-line").attr("x2", this.width + this.width);
+      }
+    },
+  },
+  mounted() {
+    const focus = d3.select(".focus");
+    d3.select(".overlay")
+      .on("mouseover", function() {
+        focus.style("display", "inline");
+      })
+      .on("mouseout", function() {
+        focus.style("display", "none");
+      })
+      .on("mousemove", this.mousemove);
   },
   // methods: {
   // createGraph() {
@@ -245,6 +295,26 @@ export default {
 .last-week {
   stroke: steelblue;
   opacity: 0.2;
+}
+
+.overlay {
+  border: 1px solid red;
+  fill: none;
+  pointer-events: all;
+}
+
+.focus {
+  display: none;
+}
+
+.focus circle {
+  fill: steelblue;
+}
+
+.hover-line {
+  stroke: #6f257f;
+  stroke-width: 2px;
+  stroke-dasharray: 3, 3;
 }
 
 @media only screen and (max-width: 600px) {
