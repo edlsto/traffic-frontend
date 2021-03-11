@@ -1,6 +1,10 @@
 <template>
   <svg class="chart" :viewBox="viewBox">
-    <g :transform="`translate(${this.margin.left}, ${this.margin.top})`">
+    <g
+      :transform="
+        `translate(${this.margin.left}, ${this.margin.top + this.legendHeight})`
+      "
+    >
       <path
         v-for="(dataset, index) in dataToChart"
         :key="index"
@@ -22,10 +26,40 @@
     </g>
     <rect
       class="overlay"
-      :transform="`translate(${this.margin.left}, ${this.margin.top})`"
+      :transform="
+        `translate(${this.margin.left}, ${this.margin.top + this.legendHeight})`
+      "
       :width="width"
       :height="height"
     ></rect>
+    <g
+      :transform="
+        `translate(${this.margin.left + this.width / 2 - legendWidth / 2}, ${
+          this.margin.top
+        })`
+      "
+    >
+      <rect fill="none" :width="legendWidth" :height="legendHeight"></rect>
+      <text :x="15" :y="legendHeight / 2 + 6">Today</text>
+      <line
+        x1="70"
+        x2="120"
+        y1="27"
+        y2="27"
+        stroke-width="3"
+        stroke="steelblue"
+      ></line>
+      <text :x="170" :y="legendHeight / 2 + 6">Yesterday</text>
+      <line
+        x1="260"
+        x2="310"
+        y1="27"
+        y2="27"
+        stroke-width="3"
+        stroke="steelblue"
+        opacity="0.2"
+      ></line>
+    </g>
   </svg>
 </template>
 
@@ -40,6 +74,8 @@ export default {
       bisectDate: d3.bisector(function(d) {
         return d.timeStamp;
       }).left,
+      legendWidth: 300,
+      legendHeight: 50,
     };
   },
   props: {
@@ -115,7 +151,8 @@ export default {
       return `0 0 ${this.width + this.margin.left + this.margin.right} ${this
         .height +
         this.margin.bottom +
-        this.margin.top}`;
+        this.margin.top +
+        this.legendHeight}`;
     },
   },
   directives: {
@@ -217,7 +254,6 @@ export default {
 }
 
 .overlay {
-  border: 1px solid red;
   fill: none;
   pointer-events: all;
 }
