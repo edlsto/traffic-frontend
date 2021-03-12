@@ -96,7 +96,7 @@ export default {
     lastWeekTransposed() {
       return this.lastWeeksData.map((d) => ({
         ...d,
-        timeStamp: d.timeStamp + 24 * 60 * 60 * 1000,
+        timeStamp: d.timeStamp + 24 * 7 * 60 * 60 * 1000,
       }));
     },
     dataToChart() {
