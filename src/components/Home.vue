@@ -147,7 +147,6 @@ export default {
   async created() {
     try {
       axios.get("https://edwardisthe.best/photos").then((response) => {
-        console.log(response.data);
         this.cameraData = {
           genesee: response.data.CameraView[0],
           copper: response.data.CameraView[1],
