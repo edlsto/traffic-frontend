@@ -49,7 +49,7 @@
         stroke-width="3"
         stroke="steelblue"
       ></line>
-      <text :x="170" :y="legendHeight / 2 + 6">Yesterday</text>
+      <text :x="170" :y="legendHeight / 2 + 6">7 days ago</text>
       <line
         x1="260"
         x2="310"
