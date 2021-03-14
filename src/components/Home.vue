@@ -21,14 +21,14 @@
       <div class="text-lg">
         <h2 class="text-lg mt-8" v-if="this.direction === 'East'">
           Travel time between Vail and Denver (eastbound) is currently
-          <span v-if="this.travelTime">
+          <span v-if="this.travelTime.TravelTime">
             {{ this.travelTime[0].TravelTime[0].Hours[0] }} hour
             {{ this.travelTime[0].TravelTime[0].Minutes[0] }} minutes
           </span>
         </h2>
         <h2 class="text-lg mt-8" v-else>
           Travel time between Denver and Vail (westbound) is currently
-          <span v-if="this.travelTime">
+          <span v-if="this.travelTime.TravelTime">
             {{ this.travelTime[1].TravelTime[0].Hours[0] }} hour
             {{ this.travelTime[1].TravelTime[0].Minutes[0] }} minutes
           </span>
@@ -147,6 +147,7 @@ export default {
   async created() {
     try {
       axios.get("https://edwardisthe.best/photos").then((response) => {
+        console.log(response.data.CameraView[0]);
         this.cameraData = {
           genesee: response.data.CameraView[0],
           copper: response.data.CameraView[1],
