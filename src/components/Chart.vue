@@ -65,6 +65,7 @@
 
 <script>
 import * as d3 from "d3";
+import moment from "moment";
 export default {
   name: "Chart",
   data() {
@@ -93,10 +94,18 @@ export default {
     },
   },
   computed: {
+    isStandardToDST() {
+      return (
+        !moment(this.lastWeeksData[0].timeStamp).isDST() &&
+        moment(this.todaysData[0].timeStamp).isDST()
+      );
+    },
     lastWeekTransposed() {
       return this.lastWeeksData.map((d) => ({
         ...d,
-        timeStamp: d.timeStamp + 24 * 7 * 60 * 60 * 1000,
+        timeStamp: this.isStandardToDST
+          ? d.timeStamp + 24 * 6 * 60 * 60 * 1000 + 23 * 1 * 60 * 60 * 1000
+          : d.timeStamp + 24 * 7 * 60 * 60 * 1000,
       }));
     },
     dataToChart() {
