@@ -142,6 +142,7 @@ export default {
   mounted() {
     window.addEventListener("resize", this.onResize);
     this.direction = new Date().getHours() < 12 ? "West" : "East";
+    this.track();
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.onResize);
