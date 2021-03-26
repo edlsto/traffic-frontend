@@ -10,7 +10,7 @@ Vue.use(VueAnalytics, {
 Vue.config.productionTip = false;
 
 Vue.use(VueAnalytics, {
-  config: { id: "UA-173458814-2" },
+  id: "UA-173458814-2",
 });
 
 new Vue({
