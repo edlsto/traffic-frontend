@@ -135,6 +135,9 @@ export default {
           travelTime: parseInt(d.travelTime),
         }));
     },
+    track() {
+      this.$ga.page("/");
+    },
   },
   mounted() {
     window.addEventListener("resize", this.onResize);
