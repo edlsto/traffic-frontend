@@ -17,6 +17,7 @@
     "postcss": "^7.0.35",
     "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.2",
     "vue": "^2.6.11",
+    "vue-analytics": "^5.22.1",
     "vue-gtag": "^1.11.0",
     "xml2js": "^0.4.23"
   },

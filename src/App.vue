@@ -12,6 +12,9 @@ export default {
   components: {
     Home,
   },
+  mounted() {
+    this.$ga.page("/");
+  },
 };
 </script>
 
