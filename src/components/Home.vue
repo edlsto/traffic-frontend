@@ -135,14 +135,10 @@ export default {
           travelTime: parseInt(d.travelTime),
         }));
     },
-    track() {
-      this.$ga.page("/");
-    },
   },
   mounted() {
     window.addEventListener("resize", this.onResize);
     this.direction = new Date().getHours() < 12 ? "West" : "East";
-    this.track();
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.onResize);
