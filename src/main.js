@@ -3,10 +3,6 @@ import App from "./App.vue";
 import "../src/assets/css/tailwind.css";
 import VueAnalytics from "vue-analytics";
 
-Vue.use(VueAnalytics, {
-  id: "UA-XXX-X",
-});
-
 Vue.config.productionTip = false;
 
 Vue.use(VueAnalytics, {
