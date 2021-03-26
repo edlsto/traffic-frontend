@@ -12,11 +12,6 @@ export default {
   components: {
     Home,
   },
-  methods: {
-    track() {
-      this.$ga.page("/");
-    },
-  },
 };
 </script>
 
