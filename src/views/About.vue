@@ -27,7 +27,7 @@
 export default {
   name: "About",
   metaInfo: {
-    title: "I-70 Traffic Guide, Vail to Denver, Colorado",
+    title: "I-70 Traffic Guide - Vail to Denver, Colorado",
   },
 };
 </script>
