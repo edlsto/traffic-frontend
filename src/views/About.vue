@@ -29,10 +29,4 @@ export default {
 };
 </script>
 
-<style scoped>
-.ctn {
-}
-
-.text {
-}
-</style>
+<style scoped></style>
