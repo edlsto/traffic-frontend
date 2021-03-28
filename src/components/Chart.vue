@@ -60,6 +60,14 @@
         opacity="0.2"
       ></line>
     </g>
+    <text
+      class="source-text"
+      :x="margin.left + width"
+      :y="height + legendHeight + margin.top + 50"
+      text-anchor="end"
+    >
+      Source: Colorado Department of Transportation
+    </text>
   </svg>
 </template>
 
@@ -279,6 +287,10 @@ export default {
   stroke: steelblue;
   stroke-width: 2px;
   opacity: 0.2;
+}
+
+.source-text {
+  font-size: 0.85em;
 }
 
 @media only screen and (max-width: 600px) {

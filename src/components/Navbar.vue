@@ -1,10 +1,14 @@
 <template>
-  <div class="ctn flex items-center">
-    <div class=" p-4 text-xl font-bold">
+  <div class="ctn flex items-end bg-gray-200 p-8">
+    <div class="text-xl font-bold pr-4 logo">
       I-70 Guide
     </div>
-    <div class="p-4 cursor-pointer">Home</div>
-    <div class="p-4 cursor-pointer">About</div>
+    <div class="cursor-pointer px-4 nav-item">
+      <router-link to="/">Home</router-link>
+    </div>
+    <div class="cursor-pointer px-4 nav-item">
+      <router-link to="/about">About</router-link>
+    </div>
   </div>
 </template>
 
@@ -15,7 +19,7 @@ export default {
 </script>
 
 <style scoped>
-.ctn {
-  border: 1px solid dodgerblue;
+.nav-item {
+  padding-bottom: 1px;
 }
 </style>
