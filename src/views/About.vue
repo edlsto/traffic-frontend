@@ -1,6 +1,6 @@
 <template>
   <div class="bg-gray-200 ctn">
-    <div class="text mx-auto my-32 max-w-2xl leading-loose">
+    <div class="text mx-auto my-32 max-w-2xl max-w-sm leading-loose">
       <p class="pb-4">
         This is an app that visualizes the traffic times on Interstate 70
         between Denver and Vail, Colorado.
@@ -29,4 +29,10 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+@media only screen and (max-width: 800px) {
+  .text {
+    max-width: 90%;
+  }
+}
+</style>

@@ -18,7 +18,7 @@
         </option>
       </select>
 
-      <div class="text-lg">
+      <div class="text-lg marquee">
         <h2 class="text-lg mt-8" v-if="this.direction === 'East'">
           Travel time between Vail and Denver (eastbound) is currently
           <span v-if="this.travelTime && this.travelTime[0].TravelTime">
@@ -197,5 +197,9 @@ export default {
   grid-template-columns: repeat(auto-fit, minmax(320px, 400px));
   max-width: 1200px;
   margin: 1em auto;
+}
+
+.marquee {
+  padding: 0 2rem;
 }
 </style>
