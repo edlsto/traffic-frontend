@@ -75,6 +75,9 @@ import Card from "@/components/Card";
 import Spinner from "@/components/Spinner";
 export default {
   name: "Home",
+  metaInfo: {
+    title: "I-70 Traffic Guide, Vail to Denver, Colorado",
+  },
   components: {
     Chart,
     Spinner,
