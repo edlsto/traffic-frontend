@@ -1,9 +1,10 @@
 <template>
   <div class="text-center bg-gray-200 h-full">
+    <Navbar />
     <div class="font-sans-serif pt-12 text-gray-700">
-      <h1 class="text-6xl sm:text-8xl font-bold">
+      <!-- <h1 class="text-6xl sm:text-8xl font-bold">
         I-70 guide
-      </h1>
+      </h1> -->
 
       <select
         class="w-24 text-gray-700 py-2 px-3 mt-8 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500"
@@ -73,12 +74,14 @@ import axios from "axios";
 import Chart from "./Chart";
 import Card from "./Card";
 import Spinner from "./Spinner";
+import Navbar from "./Navbar";
 export default {
   name: "Home",
   components: {
     Chart,
     Spinner,
     Card,
+    Navbar,
   },
   data() {
     return {
@@ -195,5 +198,7 @@ export default {
 .gallery {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 400px));
+  max-width: 1200px;
+  margin: 1em auto;
 }
 </style>
