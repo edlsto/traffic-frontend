@@ -11,6 +11,9 @@
         Vue, D3, TailwindCSS, Node, Express, MongoDB and Mongoose.
       </p>
       <p class="pb-4">
+        It uses data from the Colorado Department of Transportation's API.
+      </p>
+      <p class="pb-4">
         You can check out the repo
         <a class="underline" href="https://github.com/edlsto/traffic-frontend"
           >here</a
