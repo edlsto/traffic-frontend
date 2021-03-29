@@ -199,7 +199,8 @@ export default {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 400px));
   max-width: 1200px;
-  margin: 1em auto;
+  margin: 1em auto 0;
+  padding-bottom: 3em;
 }
 
 .marquee {

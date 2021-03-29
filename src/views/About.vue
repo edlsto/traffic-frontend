@@ -37,5 +37,9 @@ export default {
   .text {
     max-width: 90%;
   }
+
+  .ctn {
+    height: 100%;
+  }
 }
 </style>
